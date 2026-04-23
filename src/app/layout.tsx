@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Link from "next/link";
+import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "Portal de Elite | Notícias e Inteligência",
-  description: "O portal definitivo para concursos, relacionamentos e prosperidade bíblica.",
+  title: "Concursos Elite | O Portal do Futuro Servidor",
+  description: "As melhores notícias, editais analisados e estratégias para a sua aprovação.",
 };
 
 export default function RootLayout({
@@ -14,23 +15,44 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className="min-h-screen flex flex-col">
-        {/* Header de Elite */}
-        <header className="sticky top-0 z-50 glass">
-          <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-            <Link href="/" className="text-xl font-bold tracking-tighter hover:opacity-80 transition-opacity">
-              PORTAL<span className="text-blue-600">ELITE</span>
+      <head>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-L3Z9YV2J6B"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-L3Z9YV2J6B');
+          `}
+        </Script>
+      </head>
+      <body className="min-h-screen flex flex-col bg-slate-50">
+        {/* Header Focado em Concursos */}
+        <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+          <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+            <Link href="/" className="flex items-center space-x-2 group">
+              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xl group-hover:rotate-6 transition-transform">
+                C
+              </div>
+              <span className="text-2xl font-black tracking-tighter text-gray-900">
+                CONCURSOS<span className="text-blue-600">ELITE</span>
+              </span>
             </Link>
             
-            <nav className="hidden md:flex items-center space-x-8 text-sm font-medium">
-              <Link href="/concursos" className="hover:text-blue-600 transition-colors">Concursos</Link>
-              <Link href="/relacionamentos" className="hover:text-blue-600 transition-colors">Relacionamentos</Link>
-              <Link href="/riqueza" className="hover:text-blue-600 transition-colors">Riqueza Abençoada</Link>
+            <nav className="hidden lg:flex items-center space-x-8 text-[13px] font-extrabold uppercase tracking-widest text-gray-500">
+              <Link href="/" className="text-blue-600 border-b-2 border-blue-600 pb-1">Início</Link>
+              <Link href="#" className="hover:text-blue-600 transition-colors">Editais Abertos</Link>
+              <Link href="#" className="hover:text-blue-600 transition-colors">Inscrições</Link>
+              <Link href="#" className="hover:text-blue-600 transition-colors">Materiais Gratuitos</Link>
             </nav>
 
             <div className="flex items-center space-x-4">
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/30">
-                Assinar Sofia
+              <button className="hidden md:block text-sm font-bold text-gray-500 hover:text-blue-600">Entrar</button>
+              <button className="bg-blue-600 text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/30">
+                ASSINAR SOFIA
               </button>
             </div>
           </div>
@@ -40,32 +62,32 @@ export default function RootLayout({
           {children}
         </main>
 
-        <footer className="border-t border-gray-100 dark:border-gray-800 py-12 bg-gray-50 dark:bg-gray-900/50">
-          <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+        <footer className="bg-gray-900 text-white py-16 mt-20">
+          <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
             <div className="col-span-1 md:col-span-2">
-              <h3 className="text-lg font-bold mb-4">Portal Elite</h3>
-              <p className="text-gray-500 text-sm max-w-sm">
-                Inteligência e automação a serviço da sua evolução. Onde a IA encontra o conteúdo de alta performance.
+              <h3 className="text-2xl font-black mb-6">Concursos Elite</h3>
+              <p className="text-gray-400 text-sm max-w-sm leading-relaxed">
+                Transformando a preparação de milhares de brasileiros através da inteligência artificial e jornalismo de alta performance. 
               </p>
             </div>
             <div>
-              <h4 className="font-bold mb-4">Ninhos</h4>
-              <ul className="space-y-2 text-sm text-gray-500">
-                <li><Link href="/concursos">Carreiras Públicas</Link></li>
-                <li><Link href="/relacionamentos">Vida a Dois</Link></li>
-                <li><Link href="/riqueza">Prosperidade Bíblica</Link></li>
+              <h4 className="text-blue-500 font-black uppercase text-xs tracking-widest mb-6">Navegação</h4>
+              <ul className="space-y-4 text-sm font-bold text-gray-300">
+                <li><Link href="#" className="hover:text-white transition-colors">Carreiras Públicas</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors">Notícias por Estado</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors">Bancas Organizadoras</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm text-gray-500">
-                <li><Link href="/termos">Termos de Uso</Link></li>
-                <li><Link href="/privacidade">Privacidade</Link></li>
+              <h4 className="text-blue-500 font-black uppercase text-xs tracking-widest mb-6">Legal</h4>
+              <ul className="space-y-4 text-sm font-bold text-gray-300">
+                <li><Link href="#" className="hover:text-white transition-colors">Termos de Uso</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors">Política de Privacidade</Link></li>
               </ul>
             </div>
           </div>
-          <div className="max-w-7xl mx-auto px-4 mt-12 pt-8 border-t border-gray-100 dark:border-gray-800 text-center text-xs text-gray-400">
-            &copy; {new Date().getFullYear()} Portal Elite - Arthur Lopes & Sofia IA. Todos os direitos reservados.
+          <div className="max-w-7xl mx-auto px-4 mt-16 pt-8 border-t border-white/5 text-center text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+            &copy; {new Date().getFullYear()} Concursos Elite - Arthur Lopes & Sofia IA.
           </div>
         </footer>
       </body>
