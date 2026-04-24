@@ -19,7 +19,7 @@ interface PostCardProps {
 
 export default function PostCard({ post }: PostCardProps) {
   const [imageError, setImageError] = useState(false);
-  const [fallbackStep, setFallbackStep] = useState(0); // 0: Original, 1: Specific Fallback, 2: Headline Card
+  const [fallbackStep, setFallbackStep] = useState(0); // 0: Original, 1: Specific Proxy Fallback, 2: Headline Card
 
   const handleImageError = () => {
     if (fallbackStep === 0) {
@@ -29,13 +29,14 @@ export default function PostCard({ post }: PostCardProps) {
     }
   };
 
-  // Imagem de reserva específica baseada em palavras-chave
-  let fallbackUrl = 'https://images.pexels.com/photos/208444/pexels-photo-208444.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'; // Brasília (Padrão)
+  // Imagem de reserva usando PROXY para evitar bloqueio do Pexels
+  // Usando os IDs exatos que o Arthur escolheu
+  let fallbackUrl = 'https://images.weserv.nl/?url=https://images.pexels.com/photos/208444/pexels-photo-208444.jpeg'; // Brasília
   const title = post.title.toLowerCase();
   
   if (title.includes('polícia') || title.includes('prf') || title.includes('pf') || title.includes('segurança')) {
-    // Usando o ID exato encontrado pelo Arthur (Agente PRF de costas)
-    fallbackUrl = 'https://images.pexels.com/photos/27200234/pexels-photo-27200234.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';
+    // Foto do Agente PRF de costas que o Arthur achou
+    fallbackUrl = 'https://images.weserv.nl/?url=https://images.pexels.com/photos/27200234/pexels-photo-27200234.jpeg';
   }
 
   return (
