@@ -28,16 +28,23 @@ export default function ConcursosHero({ siteName }: { siteName: string }) {
               Análises de bancas, alertas no WhatsApp e a cobertura jornalística mais completa do Brasil.
             </p>
 
-            <div className="relative group max-w-2xl mx-auto lg:mx-0">
+            <form action="/busca" method="GET" className="relative group max-w-2xl mx-auto lg:mx-0">
               <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors">
                 <Search size={22} />
               </div>
               <input 
+                name="q"
                 type="text" 
                 placeholder="Busque por cargo, órgão ou estado..."
-                className="w-full pl-14 pr-6 py-4.5 md:py-5 rounded-2xl bg-white border border-gray-200 text-gray-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-base shadow-xl placeholder:text-gray-400"
+                className="w-full pl-14 pr-32 py-4.5 md:py-5 rounded-2xl bg-white border border-gray-200 text-gray-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-base shadow-xl placeholder:text-gray-400"
               />
-            </div>
+              <button 
+                type="submit"
+                className="absolute right-2 top-2 bottom-2 bg-blue-600 text-white px-6 rounded-xl text-xs font-black hover:bg-blue-700 transition-colors"
+              >
+                BUSCAR
+              </button>
+            </form>
           </div>
 
           {/* Stats/Trending Section - Refined for Light Mode */}
