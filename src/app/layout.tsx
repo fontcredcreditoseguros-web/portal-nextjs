@@ -14,7 +14,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const headerList = headers();
+  const headerList = await headers();
   const host = headerList.get('x-forwarded-host') || headerList.get('host') || '';
 
   // Customização de Marca por Domínio

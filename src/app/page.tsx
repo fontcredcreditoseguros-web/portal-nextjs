@@ -20,7 +20,7 @@ async function getPosts(niche: string) {
 }
 
 export default async function DynamicHome() {
-  const headerList = headers();
+  const headerList = await headers();
   const host = headerList.get('x-forwarded-host') || headerList.get('host') || '';
   
   // Detecção Automática de Nicho por Domínio
