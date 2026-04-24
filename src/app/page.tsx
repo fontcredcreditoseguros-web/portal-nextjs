@@ -36,7 +36,7 @@ export default async function DynamicHome() {
       <ConcursosHero siteName={siteName} />
 
       {/* Categorias Rápidas */}
-      <div className="max-w-7xl mx-auto px-4 -mt-10">
+      <div className="max-w-7xl mx-auto px-4 -mt-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <QuickCat icon={<Flame className="text-orange-500" />} label="Editais Abertos" />
           <QuickCat icon={<MapPin className="text-blue-500" />} label="Por Região" />
@@ -46,24 +46,24 @@ export default async function DynamicHome() {
       </div>
 
       {/* Grid de Estados (Ocupação de Vazio Operacional) */}
-      <div className="max-w-7xl mx-auto px-4 mt-16">
-        <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between mb-8">
+      <div className="max-w-7xl mx-auto px-4 mt-12">
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-xl font-black text-gray-900">Concursos por Estado</h3>
-              <p className="text-sm text-gray-400">Encontre oportunidades na sua região</p>
+              <h3 className="text-lg font-black text-gray-900 leading-none mb-1">Concursos por Estado</h3>
+              <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Acesso Rápido</p>
             </div>
-            <Link href="#" className="text-xs font-black text-blue-600 hover:underline uppercase tracking-widest">Ver Todos</Link>
+            <Link href="#" className="text-[10px] font-black text-blue-600 hover:underline uppercase tracking-widest">Ver Todos</Link>
           </div>
           
-          <div className="grid grid-cols-4 md:grid-cols-7 lg:grid-cols-9 gap-3">
+          <div className="grid grid-cols-5 md:grid-cols-7 lg:grid-cols-9 gap-2">
             {['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'].map((uf) => (
               <Link 
                 key={uf} 
                 href={`/concursos?estado=${uf}`}
-                className="flex flex-col items-center justify-center py-4 rounded-2xl bg-gray-50 border border-gray-100 hover:bg-blue-600 hover:text-white hover:shadow-lg hover:-translate-y-1 transition-all group"
+                className="flex flex-col items-center justify-center py-3 rounded-xl bg-gray-50 border border-gray-100 hover:bg-blue-600 hover:text-white hover:shadow-lg transition-all group"
               >
-                <span className="text-sm font-black">{uf}</span>
+                <span className="text-xs font-black">{uf}</span>
               </Link>
             ))}
           </div>
