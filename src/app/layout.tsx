@@ -2,19 +2,17 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Link from "next/link";
 import Script from "next/script";
-import { headers } from 'next/headers';
 
 export const metadata: Metadata = {
   title: "Concursos Elite | A Sua Aprovação Começa Aqui",
   description: "As melhores notícias, editais analisados e estratégias para você conquistar sua vaga em 2026.",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Foco exclusivo no Portal de Concursos
   const siteName = 'CONCURSOS';
   const accentColor = 'text-blue-600';
   const logoBg = 'bg-blue-600';
