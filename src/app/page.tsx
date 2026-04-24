@@ -45,6 +45,31 @@ export default async function DynamicHome() {
         </div>
       </div>
 
+      {/* Grid de Estados (Ocupação de Vazio Operacional) */}
+      <div className="max-w-7xl mx-auto px-4 mt-16">
+        <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h3 className="text-xl font-black text-gray-900">Concursos por Estado</h3>
+              <p className="text-sm text-gray-400">Encontre oportunidades na sua região</p>
+            </div>
+            <Link href="#" className="text-xs font-black text-blue-600 hover:underline uppercase tracking-widest">Ver Todos</Link>
+          </div>
+          
+          <div className="grid grid-cols-4 md:grid-cols-7 lg:grid-cols-9 gap-3">
+            {['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'].map((uf) => (
+              <Link 
+                key={uf} 
+                href={`/concursos?estado=${uf}`}
+                className="flex flex-col items-center justify-center py-4 rounded-2xl bg-gray-50 border border-gray-100 hover:bg-blue-600 hover:text-white hover:shadow-lg hover:-translate-y-1 transition-all group"
+              >
+                <span className="text-sm font-black">{uf}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 py-16">
         <div className="flex items-center justify-between mb-10">
           <h2 className="text-3xl font-black text-gray-900 flex items-center">

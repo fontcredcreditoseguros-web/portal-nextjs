@@ -26,7 +26,12 @@ export default function PostCard({ post }: PostCardProps) {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           referrerPolicy="no-referrer"
           onError={(e: any) => {
-            e.target.src = 'https://images.pexels.com/photos/3825527/pexels-photo-3825527.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'; // Fallback image: Library/Study
+            const title = post.title.toLowerCase();
+            if (title.includes('polícia') || title.includes('prf') || title.includes('pf') || title.includes('segurança')) {
+              e.target.src = 'https://images.pexels.com/photos/9324332/pexels-photo-9324332.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'; // Viatura/Polícia
+            } else {
+              e.target.src = 'https://images.pexels.com/photos/5668473/pexels-photo-5668473.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'; // Justiça/Governo
+            }
           }}
         />
         <div className="absolute top-4 left-4 bg-white/90 dark:bg-black/80 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
