@@ -15,19 +15,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const headerList = headers();
-  const host = headerList.get('host') || '';
-  
+  const host = headerList.get('x-forwarded-host') || headerList.get('host') || '';
+
   // Customização de Marca por Domínio
   let siteName = 'CONCURSOS';
   let accentColor = 'text-blue-600';
   let logoBg = 'bg-blue-600';
   let gaId = 'G-L3Z9YV2J6B'; // Padrão Concursos
 
-  if (host.includes('casamento') || host.includes('relacionamentos')) {
+  const isCasamento = host.includes('casamento') || host.includes('relacionamentos');
+  const isRiqueza = host.includes('riqueza') || host.includes('abencoada');
+
+  if (isCasamento) {
     siteName = 'VIDA A DOIS';
     accentColor = 'text-rose-600';
     logoBg = 'bg-rose-600';
-  } else if (host.includes('riqueza')) {
+  } else if (isRiqueza) {
     siteName = 'RIQUEZA';
     accentColor = 'text-emerald-600';
     logoBg = 'bg-emerald-600';
@@ -60,7 +63,7 @@ export default function RootLayout({
                 {siteName}<span className={accentColor}>ELITE</span>
               </span>
             </Link>
-            
+
             <nav className="hidden lg:flex items-center space-x-8 text-[11px] font-black uppercase tracking-widest text-gray-400">
               <Link href="/" className="hover:text-gray-900">Home</Link>
               <Link href="#" className="hover:text-gray-900">Novidades</Link>
@@ -79,14 +82,14 @@ export default function RootLayout({
 
         <footer className="bg-white border-t border-gray-100 py-12">
           <div className="max-w-7xl mx-auto px-4 text-center">
-             <div className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">
-                © {new Date().getFullYear()} {siteName} ELITE - Arthur Lopes & Sofia IA
-             </div>
-             <div className="flex justify-center space-x-6 text-xs font-bold text-gray-300">
-                <Link href="#">Privacidade</Link>
-                <Link href="#">Termos</Link>
-                <Link href="#">Suporte</Link>
-             </div>
+            <div className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">
+              © {new Date().getFullYear()} {siteName} ELITE - Arthur Lopes & Sofia IA
+            </div>
+            <div className="flex justify-center space-x-6 text-xs font-bold text-gray-300">
+              <Link href="#">Privacidade</Link>
+              <Link href="#">Termos</Link>
+              <Link href="#">Suporte</Link>
+            </div>
           </div>
         </footer>
       </body>

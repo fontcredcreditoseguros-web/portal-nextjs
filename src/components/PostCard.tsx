@@ -17,11 +17,15 @@ interface PostCardProps {
 export default function PostCard({ post }: PostCardProps) {
   return (
     <article className="group bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
-      <Link href={`/${post.niche}/${post.slug}`} className="block relative h-48 overflow-hidden">
+      <Link href={`/${post.niche}/${post.slug}`} className="block relative aspect-video overflow-hidden bg-gray-100 dark:bg-gray-800">
         <img 
           src={post.image_url || '/placeholder.jpg'} 
           alt={post.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          referrerPolicy="no-referrer"
+          onError={(e: any) => {
+            e.target.src = 'https://images.pexels.com/photos/3825527/pexels-photo-3825527.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'; // Fallback image: Library/Study
+          }}
         />
         <div className="absolute top-4 left-4 bg-white/90 dark:bg-black/80 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
           {post.niche}
