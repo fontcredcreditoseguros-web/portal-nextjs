@@ -30,13 +30,13 @@ export default function PostCard({ post }: PostCardProps) {
   };
 
   // Imagem de reserva usando PROXY para evitar bloqueio do Pexels
-  // Usando os IDs exatos que o Arthur escolheu
+  // ID VALIDADO (23709223): Agentes da PRF Reais
   let fallbackUrl = 'https://images.weserv.nl/?url=https://images.pexels.com/photos/208444/pexels-photo-208444.jpeg'; // Brasília
   const title = post.title.toLowerCase();
   
   if (title.includes('polícia') || title.includes('prf') || title.includes('pf') || title.includes('segurança')) {
-    // Foto do Agente PRF de costas que o Arthur achou
-    fallbackUrl = 'https://images.weserv.nl/?url=https://images.pexels.com/photos/27200234/pexels-photo-27200234.jpeg';
+    // Foto VALIDADA de agentes da PRF em operação
+    fallbackUrl = 'https://images.weserv.nl/?url=https://images.pexels.com/photos/23709223/pexels-photo-23709223.jpeg';
   }
 
   return (
