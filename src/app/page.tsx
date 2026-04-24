@@ -3,6 +3,7 @@ import PostCard from '@/components/PostCard';
 import ConcursosHero from '@/components/ConcursosHero';
 import { Search, MapPin, GraduationCap, Building2, Flame, Heart, Wallet } from 'lucide-react';
 import { headers } from 'next/headers';
+import Link from 'next/link';
 
 export const revalidate = 60;
 

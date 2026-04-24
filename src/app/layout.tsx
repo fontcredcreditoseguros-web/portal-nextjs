@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: "As melhores notícias e estratégias para a sua evolução.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
