@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -17,26 +18,35 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post }: PostCardProps) {
+  const [imageError, setImageError] = useState(false);
+
   return (
     <article className="group bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
       <Link href={`/${post.niche}/${post.slug}`} className="block relative aspect-video overflow-hidden bg-gray-100 dark:bg-gray-800">
-        <img 
-          src={post.image_url || '/placeholder.jpg'} 
-          alt={post.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          referrerPolicy="no-referrer"
-          onError={(e: any) => {
-            const title = post.title.toLowerCase();
-            if (title.includes('polícia') || title.includes('prf') || title.includes('pf') || title.includes('segurança')) {
-              e.target.src = 'https://images.pexels.com/photos/7552372/pexels-photo-7552372.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'; // Viatura/Autoridade
-            } else {
-              e.target.src = 'https://images.pexels.com/photos/208444/pexels-photo-208444.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'; // Brasília/Congresso (Governo)
-            }
-          }}
-        />
-        <div className="absolute top-4 left-4 bg-white/90 dark:bg-black/80 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
-          {post.niche}
-        </div>
+        {!imageError ? (
+          <img 
+            src={post.image_url || '/placeholder.jpg'} 
+            alt={post.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            referrerPolicy="no-referrer"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-blue-600 to-blue-800 flex flex-col items-center justify-center p-6 text-center relative">
+             <div className="absolute top-4 left-4 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest text-white">
+              {post.niche}
+            </div>
+            <h3 className="text-white font-black text-lg md:text-xl leading-tight mb-2 drop-shadow-xl line-clamp-3">
+              {post.title}
+            </h3>
+            <div className="w-10 h-1 bg-white/30 rounded-full mt-2"></div>
+          </div>
+        )}
+        {!imageError && (
+          <div className="absolute top-4 left-4 bg-white/90 dark:bg-black/80 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
+            {post.niche}
+          </div>
+        )}
       </Link>
       
       <div className="p-6">
