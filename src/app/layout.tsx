@@ -5,8 +5,8 @@ import Script from "next/script";
 import { headers } from 'next/headers';
 
 export const metadata: Metadata = {
-  title: "Portal Elite | Inteligência em Conteúdo",
-  description: "As melhores notícias e estratégias para a sua evolução.",
+  title: "Concursos Elite | A Sua Aprovação Começa Aqui",
+  description: "As melhores notícias, editais analisados e estratégias para você conquistar sua vaga em 2026.",
 };
 
 export default async function RootLayout({
@@ -14,32 +14,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Detecção de Domínio Segura (Escudo Anti-Crash)
-  let siteName = 'CONCURSOS';
-  let accentColor = 'text-blue-600';
-  let logoBg = 'bg-blue-600';
-  let gaId = 'G-L3Z9YV2J6B';
-  let host = '';
-
-  try {
-    const headerList = await headers();
-    host = headerList.get('x-forwarded-host') || headerList.get('host') || '';
-  } catch (e) {
-    console.error("Erro ao acessar headers:", e);
-  }
-
-  const isCasamento = host.includes('casamento') || host.includes('relacionamentos');
-  const isRiqueza = host.includes('riqueza') || host.includes('abencoada');
-
-  if (isCasamento) {
-    siteName = 'VIDA A DOIS';
-    accentColor = 'text-rose-600';
-    logoBg = 'bg-rose-600';
-  } else if (isRiqueza) {
-    siteName = 'RIQUEZA';
-    accentColor = 'text-emerald-600';
-    logoBg = 'bg-emerald-600';
-  }
+  // Foco exclusivo no Portal de Concursos
+  const siteName = 'CONCURSOS';
+  const accentColor = 'text-blue-600';
+  const logoBg = 'bg-blue-600';
+  const gaId = 'G-L3Z9YV2J6B';
 
   return (
     <html lang="pt-BR">
@@ -70,20 +49,24 @@ export default async function RootLayout({
             </Link>
 
             <nav className="hidden lg:flex items-center space-x-8 text-[11px] font-black uppercase tracking-widest text-gray-400">
-              <Link href="/" className="hover:text-gray-900">Home</Link>
-              <Link href="#" className="hover:text-gray-900">Novidades</Link>
-              <Link href="#" className="hover:text-gray-900">Contato</Link>
+              <Link href="/" className="hover:text-gray-900">Início</Link>
+              <Link href="#" className="hover:text-gray-900">Editais Abertos</Link>
+              <Link href="#" className="hover:text-gray-900">Inscrições</Link>
+              <Link href="#" className="hover:text-gray-900">Materiais Gratuitos</Link>
             </nav>
 
-            <a 
-              href={`https://wa.me/556792943130?text=Olá%20Sofia,%20quero%20me%20inscrever%20na%20Newsletter%20Elite%20do%20portal%20${siteName}!`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`${logoBg} text-white px-6 py-3 rounded-2xl text-xs font-black hover:opacity-90 transition-all shadow-lg flex items-center space-x-2`}
-            >
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span>NEWSLETTER WHATSAPP</span>
-            </a>
+            <div className="flex items-center space-x-4">
+              <Link href="#" className="text-xs font-bold text-gray-500 hover:text-gray-900">Entrar</Link>
+              <a 
+                href={`https://wa.me/556792943130?text=Olá%20Sofia,%20quero%20me%20inscrever%20na%20Newsletter%20Elite!`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${logoBg} text-white px-6 py-3 rounded-2xl text-xs font-black hover:opacity-90 transition-all shadow-lg flex items-center space-x-2`}
+              >
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span>NEWSLETTER WHATSAPP</span>
+              </a>
+            </div>
           </div>
         </header>
 
@@ -94,7 +77,7 @@ export default async function RootLayout({
         <footer className="bg-white border-t border-gray-100 py-12">
           <div className="max-w-7xl mx-auto px-4 text-center">
             <div className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">
-              © {new Date().getFullYear()} {siteName} ELITE - Arthur Lopes & Sofia IA
+              © {new Date().getFullYear()} CONCURSOS ELITE - Arthur Lopes & Sofia IA
             </div>
             <div className="flex justify-center space-x-6 text-xs font-bold text-gray-300">
               <Link href="#">Privacidade</Link>

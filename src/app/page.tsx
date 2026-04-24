@@ -1,8 +1,7 @@
 import { supabase } from '@/lib/supabaseClient';
 import PostCard from '@/components/PostCard';
 import ConcursosHero from '@/components/ConcursosHero';
-import { Search, MapPin, GraduationCap, Building2, Flame, Heart, Wallet } from 'lucide-react';
-import { headers } from 'next/headers';
+import { Search, MapPin, GraduationCap, Building2, Flame } from 'lucide-react';
 import Link from 'next/link';
 
 export const revalidate = 60;
@@ -21,108 +20,28 @@ async function getPosts(niche: string) {
 }
 
 export default async function DynamicHome() {
-  // Detecção de Nicho Segura
-  let host = '';
-  try {
-    const headerList = await headers();
-    host = headerList.get('x-forwarded-host') || headerList.get('host') || '';
-  } catch (e) {
-    console.error("Erro no page headers:", e);
-  }
-  
-  // Detecção Automática de Nicho por Domínio
-  let niche = 'concursos';
-  let siteName = 'CONCURSOS ELITE';
-  let primaryColor = 'blue';
-  let heroTitle = 'A sua aprovação começa aqui.';
-  let heroSub = 'Editais analisados e estratégias para você conquistar sua vaga em 2026.';
-
-  const isCasamento = host.includes('casamento') || host.includes('relacionamentos');
-  const isRiqueza = host.includes('riqueza') || host.includes('abencoada');
-
-  if (isCasamento) {
-    niche = 'relacionamentos';
-    siteName = 'VIDA A DOIS';
-    primaryColor = 'rose';
-    heroTitle = 'O amor é uma construção diária.';
-    heroSub = 'Dicas, reflexões e conselhos para um relacionamento inabalável.';
-  } else if (isRiqueza) {
-    niche = 'riqueza';
-    siteName = 'RIQUEZA ABENÇOADA';
-    primaryColor = 'emerald';
-    heroTitle = 'Prosperidade com Propósito.';
-    heroSub = 'Princípios bíblicos e estratégias financeiras para sua liberdade.';
-  }
+  const niche = 'concursos';
+  const siteName = 'CONCURSOS ELITE';
+  const primaryColor = 'blue';
 
   const posts = await getPosts(niche);
   const featuredPost = posts[0];
   const otherPosts = posts.slice(1);
 
-  const colorClasses: any = {
-    blue: { bg: 'bg-blue-900', text: 'text-blue-600', btn: 'bg-blue-600', light: 'bg-blue-100', focus: 'focus:ring-blue-500/30' },
-    rose: { bg: 'bg-rose-900', text: 'text-rose-600', btn: 'bg-rose-600', light: 'bg-rose-100', focus: 'focus:ring-rose-500/30' },
-    emerald: { bg: 'bg-emerald-900', text: 'text-emerald-600', btn: 'bg-emerald-600', light: 'bg-emerald-100', focus: 'focus:ring-emerald-500/30' }
-  };
-
-  const theme = colorClasses[primaryColor];
+  const theme = { bg: 'bg-blue-900', text: 'text-blue-600', btn: 'bg-blue-600', light: 'bg-blue-100', focus: 'focus:ring-blue-500/30' };
 
   return (
     <div className="bg-slate-50 min-h-screen">
-      {/* Hero Dinâmico */}
-      {niche === 'concursos' ? (
-        <ConcursosHero siteName={siteName} />
-      ) : (
-        <section className={`${theme.bg} text-white py-24 relative overflow-hidden`}>
-          <div className="absolute inset-0 bg-black/10" />
-          <div className="max-w-7xl mx-auto px-4 relative z-10">
-            <div className="max-w-3xl">
-              <h1 className="text-5xl md:text-7xl font-black mb-8 leading-tight tracking-tighter">
-                {heroTitle}
-              </h1>
-              <p className="text-xl text-white/80 mb-10 leading-relaxed">
-                {heroSub}
-              </p>
-              
-              <div className="relative max-w-2xl group">
-                <div className={`absolute inset-y-0 left-5 flex items-center pointer-events-none text-gray-400 group-focus-within:${theme.text}`}>
-                  <Search size={24} />
-                </div>
-                <input 
-                  type="text" 
-                  placeholder={`Pesquisar em ${siteName.toLowerCase()}...`}
-                  className={`w-full pl-16 pr-6 py-6 rounded-3xl bg-white text-gray-900 focus:outline-none focus:ring-8 ${theme.focus} transition-all text-lg shadow-2xl`}
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+      {/* Hero Concursos (Fixo) */}
+      <ConcursosHero siteName={siteName} />
 
-      {/* Categorias Rápidas Dinâmicas */}
+      {/* Categorias Rápidas */}
       <div className="max-w-7xl mx-auto px-4 -mt-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {niche === 'concursos' ? (
-            <>
-              <QuickCat icon={<Flame className="text-orange-500" />} label="Editais Abertos" />
-              <QuickCat icon={<MapPin className="text-blue-500" />} label="Por Região" />
-              <QuickCat icon={<GraduationCap className="text-green-500" />} label="Nível Médio" />
-              <QuickCat icon={<Building2 className="text-purple-500" />} label="Top Bancas" />
-            </>
-          ) : niche === 'relacionamentos' ? (
-            <>
-              <QuickCat icon={<Heart className="text-rose-500" />} label="Casamento" />
-              <QuickCat icon={<Flame className="text-orange-500" />} label="Namoro" />
-              <QuickCat icon={<Search className="text-blue-500" />} label="Dicas de Ouro" />
-              <QuickCat icon={<MapPin className="text-emerald-500" />} label="Eventos" />
-            </>
-          ) : (
-            <>
-              <QuickCat icon={<Wallet className="text-emerald-500" />} label="Finanças" />
-              <QuickCat icon={<Building2 className="text-blue-500" />} label="Negócios" />
-              <QuickCat icon={<Flame className="text-orange-500" />} label="Dízimos" />
-              <QuickCat icon={<GraduationCap className="text-purple-500" />} label="Cursos" />
-            </>
-          )}
+          <QuickCat icon={<Flame className="text-orange-500" />} label="Editais Abertos" />
+          <QuickCat icon={<MapPin className="text-blue-500" />} label="Por Região" />
+          <QuickCat icon={<GraduationCap className="text-green-500" />} label="Nível Médio" />
+          <QuickCat icon={<Building2 className="text-purple-500" />} label="Top Bancas" />
         </div>
       </div>
 
@@ -137,7 +56,8 @@ export default async function DynamicHome() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {featuredPost && <div className="lg:col-span-2"><PostCard post={featuredPost} /></div>}
           <aside className="space-y-6">
-            <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest">Destaques</h3>
+            <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest">MAIS LIDAS</h3>
+            
             {otherPosts.slice(0, 5).map((post: any) => (
               <Link key={post.id} href={`/${post.niche}/${post.slug}`} className="group flex space-x-4 cursor-pointer">
                  <div className="w-16 h-16 bg-gray-200 rounded-xl overflow-hidden flex-shrink-0">
@@ -147,7 +67,7 @@ export default async function DynamicHome() {
               </Link>
             ))}
 
-            {/* Radar Sofia CTA */}
+            {/* Radar Sofia CTA - Valor R$ 9,90 */}
             <div className={`${theme.bg} p-8 rounded-3xl text-white relative overflow-hidden shadow-2xl mt-12`}>
                <div className="relative z-10">
                   <div className="flex items-center space-x-2 mb-4">
