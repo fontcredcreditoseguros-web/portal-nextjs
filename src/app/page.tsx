@@ -21,8 +21,14 @@ async function getPosts(niche: string) {
 }
 
 export default async function DynamicHome() {
-  const headerList = await headers();
-  const host = headerList.get('x-forwarded-host') || headerList.get('host') || '';
+  // Detecção de Nicho Segura
+  let host = '';
+  try {
+    const headerList = await headers();
+    host = headerList.get('x-forwarded-host') || headerList.get('host') || '';
+  } catch (e) {
+    console.error("Erro no page headers:", e);
+  }
   
   // Detecção Automática de Nicho por Domínio
   let niche = 'concursos';

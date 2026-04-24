@@ -14,14 +14,19 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const headerList = await headers();
-  const host = headerList.get('x-forwarded-host') || headerList.get('host') || '';
-
-  // Customização de Marca por Domínio
+  // Detecção de Domínio Segura (Escudo Anti-Crash)
   let siteName = 'CONCURSOS';
   let accentColor = 'text-blue-600';
   let logoBg = 'bg-blue-600';
-  let gaId = 'G-L3Z9YV2J6B'; // Padrão Concursos
+  let gaId = 'G-L3Z9YV2J6B';
+  let host = '';
+
+  try {
+    const headerList = await headers();
+    host = headerList.get('x-forwarded-host') || headerList.get('host') || '';
+  } catch (e) {
+    console.error("Erro ao acessar headers:", e);
+  }
 
   const isCasamento = host.includes('casamento') || host.includes('relacionamentos');
   const isRiqueza = host.includes('riqueza') || host.includes('abencoada');
@@ -70,9 +75,15 @@ export default async function RootLayout({
               <Link href="#" className="hover:text-gray-900">Contato</Link>
             </nav>
 
-            <button className={`${logoBg} text-white px-6 py-3 rounded-2xl text-xs font-black hover:opacity-90 transition-all shadow-lg`}>
-              ASSINAR AGORA
-            </button>
+            <a 
+              href={`https://wa.me/556792943130?text=Olá%20Sofia,%20quero%20me%20inscrever%20na%20Newsletter%20Elite%20do%20portal%20${siteName}!`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${logoBg} text-white px-6 py-3 rounded-2xl text-xs font-black hover:opacity-90 transition-all shadow-lg flex items-center space-x-2`}
+            >
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span>NEWSLETTER WHATSAPP</span>
+            </a>
           </div>
         </header>
 
