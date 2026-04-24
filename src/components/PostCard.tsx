@@ -28,9 +28,9 @@ export default function PostCard({ post }: PostCardProps) {
           onError={(e: any) => {
             const title = post.title.toLowerCase();
             if (title.includes('polícia') || title.includes('prf') || title.includes('pf') || title.includes('segurança')) {
-              e.target.src = 'https://images.pexels.com/photos/9324332/pexels-photo-9324332.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'; // Viatura/Polícia
+              e.target.src = 'https://images.pexels.com/photos/7552372/pexels-photo-7552372.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'; // Viatura/Autoridade
             } else {
-              e.target.src = 'https://images.pexels.com/photos/5668473/pexels-photo-5668473.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'; // Justiça/Governo
+              e.target.src = 'https://images.pexels.com/photos/208444/pexels-photo-208444.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'; // Brasília/Congresso (Governo)
             }
           }}
         />
