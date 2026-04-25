@@ -16,18 +16,22 @@ export default async function SearchPage({
   let posts: any[] = [];
   let error: any = null;
 
+  let queryBuilder = supabase
+    .from('posts')
+    .select('*')
+    .eq('is_published', true)
+    .eq('niche', 'concursos')
+    .order('published_at', { ascending: false });
+
   if (query) {
-    const { data, error: dbError } = await supabase
-      .from('posts')
-      .select('*')
-      .eq('is_published', true)
-      .eq('niche', 'concursos')
-      .or(`title.ilike.%${query}%,content.ilike.%${query}%`)
-      .order('published_at', { ascending: false });
-    
-    posts = data || [];
-    error = dbError;
+    queryBuilder = queryBuilder.or(`title.ilike.%${query}%,content.ilike.%${query}%`);
+  } else {
+    queryBuilder = queryBuilder.limit(50);
   }
+
+  const { data, error: dbError } = await queryBuilder;
+  posts = data || [];
+  error = dbError;
 
   return (
     <div className="bg-slate-50 min-h-screen py-12 md:py-20">
