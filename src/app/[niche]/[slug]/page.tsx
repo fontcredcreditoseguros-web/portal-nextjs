@@ -46,6 +46,33 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
   // 6. Limpeza de tags HTML erradas injetadas pela IA
   sanitizedContent = sanitizedContent.replace(/<\/?html[^>]*>/gi, '');
   sanitizedContent = sanitizedContent.replace(/<\/?body[^>]*>/gi, '');
+  
+  // 7. Transformar Ficha Técnica de Texto em Card Visual (Para posts antigos)
+  sanitizedContent = sanitizedContent.replace(
+    /((?:Status do Concurso|Escolaridade|Salário Base|Vagas|Banca Organizadora|Inscrições|Remuneração):.*?(?:\n|<br\s*\/?>|$)){3,}/gi,
+    (match) => {
+        const rows = match.split(/<br\s*\/?>|\n/).filter(r => r.trim().includes(':'));
+        const listItems = rows.map(r => {
+            const [key, ...val] = r.split(':');
+            return `<li class="flex flex-col md:flex-row md:justify-between border-b border-blue-100 py-3 last:border-0 gap-1">
+                <span class="font-black text-blue-900 uppercase text-[10px] tracking-widest">${key.trim()}</span>
+                <span class="text-blue-700 font-bold text-sm">${val.join(':').trim()}</span>
+            </li>`;
+        }).join('');
+        
+        return `
+        <div class="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-100 rounded-3xl p-6 md:p-8 my-12 shadow-xl shadow-blue-500/5 not-prose">
+            <div class="flex items-center justify-between mb-8">
+                <h3 class="text-lg font-black text-blue-900 flex items-center">
+                    <span class="w-2 h-6 bg-blue-600 rounded-full mr-3"></span>
+                    DETALHES DO EDITAL
+                </h3>
+                <span class="bg-blue-600 text-white text-[9px] font-black px-3 py-1 rounded-full">RADAR ELITE</span>
+            </div>
+            <ul class="space-y-1">${listItems}</ul>
+        </div>`;
+    }
+  );
 
   return (
     <article className="max-w-4xl mx-auto px-4 py-12">
