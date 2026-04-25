@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabaseClient';
 import DensePostRow from '@/components/DensePostRow';
+import PostCard from '@/components/PostCard';
 import { MapPin, LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
 
@@ -25,6 +26,10 @@ export default async function ConcursosPage({
   }
 
   const { data: posts } = await query.order('published_at', { ascending: false });
+  
+  // Lógica de Separação Inteligente
+  const radarPosts = (posts || []).filter(p => p.excerpt && p.excerpt.includes('|'));
+  const newsPosts = (posts || []).filter(p => !p.excerpt || !p.excerpt.includes('|'));
 
   return (
     <div className="bg-slate-50 min-h-screen py-12 md:py-16">
@@ -68,11 +73,39 @@ export default async function ConcursosPage({
           </div>
         </div>
 
-        {posts && posts.length > 0 ? (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-            {posts.map((post) => (
-              <DensePostRow key={post.id} post={post} />
-            ))}
+        {(radarPosts.length > 0 || newsPosts.length > 0) ? (
+          <div className="space-y-12">
+            
+            {/* Radar de Editais */}
+            {radarPosts.length > 0 && (
+              <section>
+                <div className="flex items-center space-x-2 mb-6">
+                   <div className="w-2 h-6 bg-blue-600 rounded-full" />
+                   <h2 className="text-xl font-black text-gray-900">Radar de Editais Abertos</h2>
+                </div>
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                  {radarPosts.map((post) => (
+                    <DensePostRow key={post.id} post={post} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Notícias */}
+            {newsPosts.length > 0 && (
+              <section>
+                <div className="flex items-center space-x-2 mb-6">
+                   <div className="w-2 h-6 bg-orange-500 rounded-full" />
+                   <h2 className="text-xl font-black text-gray-900">Artigos e Notícias</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {newsPosts.map((post) => (
+                    <PostCard key={post.id} post={post} />
+                  ))}
+                </div>
+              </section>
+            )}
+
           </div>
         ) : (
           <div className="bg-white rounded-3xl p-16 text-center border border-gray-100 shadow-sm">

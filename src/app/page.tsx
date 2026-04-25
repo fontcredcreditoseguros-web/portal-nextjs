@@ -26,6 +26,10 @@ export default async function DynamicHome() {
   const primaryColor = 'blue';
 
   const posts = await getPosts(niche);
+  
+  // Lógica de Separação Inteligente
+  const radarPosts = posts.filter(p => p.excerpt && p.excerpt.includes('|'));
+  const newsPosts = posts.filter(p => !p.excerpt || !p.excerpt.includes('|'));
 
   const theme = { bg: 'bg-blue-900', text: 'text-blue-600', btn: 'bg-blue-600', light: 'bg-blue-100', focus: 'focus:ring-blue-500/30' };
 
@@ -78,12 +82,38 @@ export default async function DynamicHome() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-               {posts.map((post) => (
-                  <DensePostRow key={post.id} post={post} />
-               ))}
-            </div>
+          <div className="lg:col-span-2 space-y-12">
+            
+            {/* Seção Radar (Editais Abertos) */}
+            {radarPosts.length > 0 && (
+              <section>
+                <div className="flex items-center space-x-2 mb-6">
+                   <div className="w-2 h-6 bg-blue-600 rounded-full" />
+                   <h3 className="text-xl font-black text-gray-900">Radar de Editais Abertos</h3>
+                </div>
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                   {radarPosts.map((post) => (
+                      <DensePostRow key={post.id} post={post} />
+                   ))}
+                </div>
+              </section>
+            )}
+
+            {/* Seção Últimas Notícias */}
+            {newsPosts.length > 0 && (
+              <section>
+                <div className="flex items-center space-x-2 mb-6">
+                   <div className="w-2 h-6 bg-orange-500 rounded-full" />
+                   <h3 className="text-xl font-black text-gray-900">Últimas Notícias e Análises</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                   {newsPosts.slice(0, 4).map((post) => (
+                      <PostCard key={post.id} post={post} />
+                   ))}
+                </div>
+              </section>
+            )}
+
           </div>
           
           <aside className="space-y-6">
