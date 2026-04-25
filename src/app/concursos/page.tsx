@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabaseClient';
-import PostCard from '@/components/PostCard';
+import DensePostRow from '@/components/DensePostRow';
 import { MapPin, LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
 
@@ -20,8 +20,8 @@ export default async function ConcursosPage({
     .eq('niche', 'concursos');
 
   if (uf) {
-    // Busca pela sigla do estado no título ou conteúdo
-    query = query.or(`title.ilike.%(${uf})%,content.ilike.%${uf}%`);
+    // Busca pela sigla do estado no título ou tags
+    query = query.or(`title.ilike.%${uf}%,content.ilike.%${uf}%`);
   }
 
   const { data: posts } = await query.order('published_at', { ascending: false });
@@ -69,9 +69,9 @@ export default async function ConcursosPage({
         </div>
 
         {posts && posts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
             {posts.map((post) => (
-              <PostCard key={post.id} post={post} />
+              <DensePostRow key={post.id} post={post} />
             ))}
           </div>
         ) : (

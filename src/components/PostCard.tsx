@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import SmartImage from '@/components/SmartImage';
+import { sanitizeTitle } from '@/lib/supabaseClient';
 
 interface PostCardProps {
   post: {
@@ -18,54 +20,19 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post }: PostCardProps) {
-  const [imageError, setImageError] = useState(false);
-  const [fallbackStep, setFallbackStep] = useState(0); // 0: Original, 1: Specific Proxy Fallback, 2: Headline Card
-
-  const handleImageError = () => {
-    if (fallbackStep === 0) {
-      setFallbackStep(1);
-    } else {
-      setImageError(true);
-    }
-  };
-
-  // Imagem de reserva usando PROXY para evitar bloqueio do Pexels
-  // ID VALIDADO (23709223): Agentes da PRF Reais
-  let fallbackUrl = 'https://images.weserv.nl/?url=https://images.pexels.com/photos/208444/pexels-photo-208444.jpeg'; // Brasília
-  const title = post.title.toLowerCase();
-  
-  if (title.includes('polícia') || title.includes('prf') || title.includes('pf') || title.includes('segurança')) {
-    // Foto VALIDADA de agentes da PRF em operação
-    fallbackUrl = 'https://images.weserv.nl/?url=https://images.pexels.com/photos/23709223/pexels-photo-23709223.jpeg';
-  }
+  const cleanTitle = sanitizeTitle(post.title);
 
   return (
     <article className="group bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
       <Link href={`/${post.niche}/${post.slug}`} className="block relative aspect-video overflow-hidden bg-gray-100 dark:bg-gray-800">
-        {!imageError ? (
-          <img 
-            src={fallbackStep === 0 ? (post.image_url || '/placeholder.jpg') : fallbackUrl} 
-            alt={post.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            referrerPolicy="no-referrer"
-            onError={handleImageError}
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-blue-600 to-blue-800 flex flex-col items-center justify-center p-6 text-center relative">
-             <div className="absolute top-4 left-4 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest text-white">
-              {post.niche}
-            </div>
-            <h3 className="text-white font-black text-lg md:text-xl leading-tight mb-2 drop-shadow-xl line-clamp-3">
-              {post.title}
-            </h3>
-            <div className="w-10 h-1 bg-white/30 rounded-full mt-2"></div>
-          </div>
-        )}
-        {!imageError && (
-          <div className="absolute top-4 left-4 bg-white/90 dark:bg-black/80 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
-            {post.niche}
-          </div>
-        )}
+        <SmartImage 
+          src={post.image_url} 
+          alt={cleanTitle}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+        <div className="absolute top-4 left-4 bg-white/90 dark:bg-black/80 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
+          {post.niche}
+        </div>
       </Link>
       
       <div className="p-6">
@@ -74,7 +41,7 @@ export default function PostCard({ post }: PostCardProps) {
         </div>
         <Link href={`/${post.niche}/${post.slug}`}>
           <h2 className="text-xl font-bold mb-3 group-hover:text-blue-600 transition-colors leading-tight">
-            {post.title}
+            {cleanTitle}
           </h2>
         </Link>
         <p className="text-gray-500 dark:text-gray-400 text-sm line-clamp-3 mb-4">

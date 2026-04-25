@@ -1,7 +1,8 @@
-import { supabase } from '@/lib/supabaseClient';
+import { supabase, sanitizeTitle } from '@/lib/supabaseClient';
 import { notFound } from 'next/navigation';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import SmartImage from '@/components/SmartImage';
 
 export const revalidate = 60;
 
@@ -22,6 +23,30 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
 
   if (!post) notFound();
 
+  const cleanTitle = sanitizeTitle(post.title);
+
+  // Sanitização Cirúrgica de Conteúdo (Evita Catastrophic Backtracking)
+  let sanitizedContent = post.content || '';
+  
+  // 1. Remover links legados do Mercado Livre sem quebrar parágrafos inteiros
+  sanitizedContent = sanitizedContent.replace(/<a[^>]*href="[^"]*mercadolivre[^"]*"[^>]*>[\s\S]*?<\/a>/gi, '');
+  
+  // 2. Remover blocos Hotmart antigos
+  sanitizedContent = sanitizedContent.replace(/<div[^>]*class="[^"]*hotmart[^"]*"[\s\S]*?<\/div>/gi, '');
+  
+  // 3. Remover parágrafos vazios residuais (seguro)
+  sanitizedContent = sanitizedContent.replace(/<p[^>]*>\s*(<br\s*\/?>)?\s*<\/p>/gi, '');
+
+  // 4. Remover "LEIA TAMBÉM" e a lista subsequente
+  sanitizedContent = sanitizedContent.replace(/<h[1-6][^>]*>\s*LEIA TAMBÉM:?\s*<\/h[1-6]>[\s\S]*?(?:<\/ul>|<\/ol>)/gi, '');
+
+  // 5. Corrigir links internos do Blogger terminados em .html para rotas limpas
+  sanitizedContent = sanitizedContent.replace(/href="[^"]*\/([^\/.]+)\.html"/gi, 'href="/concursos/$1"');
+
+  // 6. Limpeza de tags HTML erradas injetadas pela IA
+  sanitizedContent = sanitizedContent.replace(/<\/?html[^>]*>/gi, '');
+  sanitizedContent = sanitizedContent.replace(/<\/?body[^>]*>/gi, '');
+
   return (
     <article className="max-w-4xl mx-auto px-4 py-12">
       {/* Header do Post */}
@@ -35,18 +60,16 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
         </div>
         
         <h1 className="text-4xl md:text-5xl font-black tracking-tight leading-tight mb-8">
-          {post.title}
+          {cleanTitle}
         </h1>
 
-        {post.image_url && (
-          <div className="relative h-[400px] w-full rounded-3xl overflow-hidden shadow-2xl mb-12">
-            <img 
-              src={post.image_url} 
-              alt={post.title}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
+        <div className="relative h-[400px] w-full rounded-3xl overflow-hidden shadow-2xl mb-12 bg-gray-100">
+          <SmartImage 
+            src={post.image_url} 
+            alt={cleanTitle}
+            className="w-full h-full object-cover"
+          />
+        </div>
       </header>
 
       {/* Conteúdo Renderizado (Onde a Sofia brilha) */}
@@ -58,7 +81,7 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
           prose-th:bg-gray-50 dark:prose-th:bg-gray-800 prose-th:px-4 prose-th:py-3
           prose-td:px-4 prose-td:py-3 prose-td:border-t
           prose-strong:text-blue-600 dark:prose-strong:text-blue-400"
-        dangerouslySetInnerHTML={{ __html: post.content }}
+        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
       />
 
       {/* Rodapé do Artigo */}
@@ -66,7 +89,7 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
         <div className="bg-gray-50 dark:bg-gray-900 rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between">
           <div>
             <h4 className="text-lg font-bold mb-2">Escrito por {post.author}</h4>
-            <p className="text-sm text-gray-500">Inteligência Artificial dedicada a carreiras e crescimento pessoal.</p>
+            <p className="text-sm text-gray-500">Inteligência Artificial dedicada a carreiras e concursos públicos.</p>
           </div>
           <button className="mt-6 md:mt-0 bg-blue-600 text-white px-8 py-3 rounded-full font-bold hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20">
             Compartilhar Notícia

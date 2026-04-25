@@ -50,12 +50,12 @@ export default function RootLayout({
             {/* Nav escondida no mobile para evitar quebra */}
             <nav className="hidden lg:flex items-center space-x-8 text-[11px] font-black uppercase tracking-widest text-gray-400">
               <Link href="/" className="hover:text-gray-900">Início</Link>
-              <Link href="#" className="hover:text-gray-900">Editais</Link>
-              <Link href="#" className="hover:text-gray-900">Inscrições</Link>
+              <Link href="/concursos" className="hover:text-gray-900">Editais</Link>
+              <Link href="/concursos" className="hover:text-gray-900">Inscrições</Link>
             </nav>
 
             <div className="flex items-center space-x-2 md:space-x-4">
-              <Link href="#" className="hidden sm:block text-xs font-bold text-gray-500 hover:text-gray-900">Entrar</Link>
+              {/* <Link href="#" className="hidden sm:block text-xs font-bold text-gray-500 hover:text-gray-900">Entrar</Link> */}
               <a 
                 href={`https://wa.me/556792943130?text=Olá%20Sofia,%20quero%20me%20inscrever%20na%20Newsletter%20Elite!`}
                 target="_blank"
@@ -80,9 +80,9 @@ export default function RootLayout({
               © {new Date().getFullYear()} CONCURSOS ELITE - Arthur Lopes & Sofia IA
             </div>
             <div className="flex justify-center space-x-6 text-[10px] font-bold text-gray-300">
-              <Link href="#">Privacidade</Link>
+              {/* <Link href="#">Privacidade</Link>
               <Link href="#">Termos</Link>
-              <Link href="#">Suporte</Link>
+              <Link href="#">Suporte</Link> */}
             </div>
           </div>
         </footer>

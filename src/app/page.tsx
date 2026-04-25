@@ -1,5 +1,6 @@
-import { supabase } from '@/lib/supabaseClient';
-import PostCard from '@/components/PostCard';
+import { supabase, sanitizeTitle } from '@/lib/supabaseClient';
+import DensePostRow from '@/components/DensePostRow';
+import SmartImage from '@/components/SmartImage';
 import ConcursosHero from '@/components/ConcursosHero';
 import { Search, MapPin, GraduationCap, Building2, Flame } from 'lucide-react';
 import Link from 'next/link';
@@ -25,8 +26,6 @@ export default async function DynamicHome() {
   const primaryColor = 'blue';
 
   const posts = await getPosts(niche);
-  const featuredPost = posts[0];
-  const otherPosts = posts.slice(1);
 
   const theme = { bg: 'bg-blue-900', text: 'text-blue-600', btn: 'bg-blue-600', light: 'bg-blue-100', focus: 'focus:ring-blue-500/30' };
 
@@ -38,10 +37,10 @@ export default async function DynamicHome() {
       {/* Categorias Rápidas */}
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <QuickCat icon={<Flame className="text-orange-500" />} label="Editais Abertos" />
-          <QuickCat icon={<MapPin className="text-blue-500" />} label="Por Região" />
-          <QuickCat icon={<GraduationCap className="text-green-500" />} label="Nível Médio" />
-          <QuickCat icon={<Building2 className="text-purple-500" />} label="Top Bancas" />
+          <QuickCat icon={<Flame className="text-orange-500" />} label="Editais Abertos" href="/concursos" />
+          <QuickCat icon={<MapPin className="text-blue-500" />} label="Por Região" href="/concursos" />
+          <QuickCat icon={<GraduationCap className="text-green-500" />} label="Nível Médio" href="/concursos" />
+          <QuickCat icon={<Building2 className="text-purple-500" />} label="Top Bancas" href="/concursos" />
         </div>
       </div>
 
@@ -53,7 +52,7 @@ export default async function DynamicHome() {
               <h3 className="text-xl font-black text-gray-900">Concursos por Estado</h3>
               <p className="text-sm text-gray-400">Encontre oportunidades na sua região</p>
             </div>
-            <Link href="#" className="text-xs font-black text-blue-600 hover:underline uppercase tracking-widest">Ver Todos os Estados</Link>
+            <Link href="/concursos" className="text-xs font-black text-blue-600 hover:underline uppercase tracking-widest">Ver Todos os Estados</Link>
           </div>
           
           <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-9 gap-2 md:gap-3">
@@ -79,18 +78,15 @@ export default async function DynamicHome() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {featuredPost && <div className="lg:col-span-2"><PostCard post={featuredPost} /></div>}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+               {posts.map((post) => (
+                  <DensePostRow key={post.id} post={post} />
+               ))}
+            </div>
+          </div>
+          
           <aside className="space-y-6">
-            <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest">MAIS LIDAS</h3>
-            
-            {otherPosts.slice(0, 5).map((post: any) => (
-              <Link key={post.id} href={`/${post.niche}/${post.slug}`} className="group flex space-x-4 cursor-pointer">
-                 <div className="w-16 h-16 bg-gray-200 rounded-xl overflow-hidden flex-shrink-0">
-                    <img src={post.image_url} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
-                 </div>
-                 <h4 className={`font-bold text-sm leading-tight group-hover:${theme.text} transition-colors line-clamp-2`}>{post.title}</h4>
-              </Link>
-            ))}
 
             {/* Radar Sofia CTA - Valor R$ 9,90 */}
             <div className={`${theme.bg} p-8 rounded-3xl text-white relative overflow-hidden shadow-2xl mt-12`}>
@@ -130,11 +126,12 @@ export default async function DynamicHome() {
   );
 }
 
-function QuickCat({ icon, label }: { icon: any, label: string }) {
-  return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
+function QuickCat({ icon, label, href }: { icon: any, label: string, href?: string }) {
+  const content = (
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer h-full">
       <div className="p-3 bg-gray-50 rounded-xl">{icon}</div>
       <span className="font-bold text-gray-700 text-sm">{label}</span>
     </div>
   );
+  return href ? <Link href={href} className="block h-full">{content}</Link> : content;
 }
