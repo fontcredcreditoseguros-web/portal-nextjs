@@ -48,11 +48,55 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
   sanitizedContent = sanitizedContent.replace(/<\/?body[^>]*>/gi, '');
   
   // 7. Transformar Ficha Técnica de Texto em Card Visual (Para posts antigos)
-  // Versão 3: Robusta contra &nbsp;, quebras de linha e falta de espaços
+  // Versão 4: Robusta contra texto puro E tabelas HTML mal formatadas
+  
+  // A. Caso seja uma TABELA (Padrão de alguns posts legados)
+  sanitizedContent = sanitizedContent.replace(
+    /<table[^>]*>[\s\S]*?(?:Status do Concurso|Escolaridade|Salário Base|Vagas|Banca Organizadora|Inscrições|Remuneração|Cargos)[\s\S]*?<\/table>/gi,
+    (match) => {
+        const rows = [];
+        const tdRegex = /<td[^>]*>([\s\S]*?)<\/td>/gi;
+        let m;
+        let currentPair = [];
+        while ((m = tdRegex.exec(match)) !== null) {
+            // Limpa HTML interno e trim
+            const text = m[1].replace(/<[^>]*>/g, '').replace(/&nbsp;/gi, ' ').replace(/:$/, '').trim();
+            if (text) {
+                currentPair.push(text);
+                if (currentPair.length === 2) {
+                    rows.push(currentPair);
+                    currentPair = [];
+                }
+            }
+        }
+        
+        if (rows.length < 2) return match; // Não parece uma ficha técnica real
+
+        const listItems = rows.map(([key, val]) => `
+            <li class="flex flex-col md:flex-row md:justify-between border-b border-blue-100 py-3 last:border-0 gap-1">
+                <span class="font-black text-blue-900 uppercase text-[10px] tracking-widest">${key}</span>
+                <span class="text-blue-700 font-bold text-sm">${val || 'A definir'}</span>
+            </li>
+        `).join('');
+
+        return `
+        <div class="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-100 rounded-3xl p-6 md:p-8 my-12 shadow-xl shadow-blue-500/5 not-prose">
+            <div class="flex items-center justify-between mb-8">
+                <h3 class="text-lg font-black text-blue-900 flex items-center">
+                    <span class="w-2 h-6 bg-blue-600 rounded-full mr-3"></span>
+                    DETALHES DO EDITAL
+                </h3>
+                <span class="bg-blue-600 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">Radar Elite</span>
+            </div>
+            <ul class="space-y-1">${listItems}</ul>
+        </div>`;
+    }
+  );
+
+  // B. Caso seja TEXTO PURO (Fallback)
   sanitizedContent = sanitizedContent.replace(
     /((?:Status do Concurso|Escolaridade|Salário Base|Vagas|Banca Organizadora|Inscrições|Remuneração|Cargos):(?:\s|&nbsp;|<br\s*\/?>)*.*?(?:<br\s*\/?>|\n|$)){3,}/gi,
     (match) => {
-        // Limpa o lixo HTML (tags <p> residuais, &nbsp;) antes de processar as linhas
         const cleanBlock = match.replace(/<\/?p>/gi, '').replace(/&nbsp;/gi, ' ');
         const rows = cleanBlock.split(/<br\s*\/?>|\n/).filter(r => r.trim().includes(':'));
         
@@ -74,7 +118,7 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
                     <span class="w-2 h-6 bg-blue-600 rounded-full mr-3"></span>
                     DETALHES DO EDITAL
                 </h3>
-                <span class="bg-blue-600 text-white text-[9px] font-black px-3 py-1 rounded-full">RADAR ELITE</span>
+                <span class="bg-blue-600 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">Radar Elite</span>
             </div>
             <ul class="space-y-1">${listItems}</ul>
         </div>`;
