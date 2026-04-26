@@ -21,8 +21,8 @@ export default async function ConcursosPage({
     .eq('niche', 'concursos');
 
   if (uf) {
-    // Busca pela sigla do estado no título ou tags
-    query = query.or(`title.ilike.%${uf}%,content.ilike.%${uf}%`);
+    // Busca exata pela sigla com delimitadores para evitar falsos positivos (ex: "SMS" caindo na busca "MS")
+    query = query.or(`title.ilike.% ${uf} %,title.ilike.%-${uf}%,title.ilike.%-${uf},title.ilike.%/${uf}%,title.ilike.%(${uf})%`);
   }
 
   const { data: posts } = await query.order('published_at', { ascending: false });
@@ -60,7 +60,7 @@ export default async function ConcursosPage({
             
             {/* Seletor Rápido de Região (Opcional) */}
             <div className="flex flex-wrap gap-2">
-               {['SP', 'RJ', 'MG', 'DF', 'PR', 'RS', 'BA', 'PE', 'PA'].map(state => (
+               {['SP', 'RJ', 'MG', 'DF', 'PR', 'RS', 'SC', 'BA', 'PE', 'CE', 'PA', 'GO', 'MS', 'MT'].map(state => (
                  <Link 
                    key={state}
                    href={`/concursos?estado=${state}`}
