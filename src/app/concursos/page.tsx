@@ -27,9 +27,25 @@ export default async function ConcursosPage({
 
   const { data: posts } = await query.order('published_at', { ascending: false });
   
-  // Lógica de Separação Inteligente
-  const radarPosts = (posts || []).filter(p => p.excerpt && p.excerpt.includes('|'));
-  const newsPosts = (posts || []).filter(p => !p.excerpt || !p.excerpt.includes('|'));
+  // Lógica de Separação Inteligente com Filtro de Validade
+  const currentYear = new Date().getFullYear();
+  
+  const radarPosts = (posts || []).filter(p => {
+    const hasStructuredData = p.excerpt && p.excerpt.includes('|');
+    if (!hasStructuredData) return false;
+
+    // Filtro Ultra-Rigoroso: Proíbe qualquer ano entre 2010 e 2025 no título
+    // Isso remove "PGE 2021", "Detran 2023", etc.
+    const hasOldYear = /20(1[0-9]|2[0-5])\b/.test(p.title);
+    if (hasOldYear) return false;
+
+    return true;
+  });
+
+  const newsPosts = (posts || []).filter(p => {
+    const isRadar = radarPosts.some(r => r.id === p.id);
+    return !isRadar;
+  });
 
   return (
     <div className="bg-slate-50 min-h-screen py-12 md:py-16">
@@ -54,7 +70,7 @@ export default async function ConcursosPage({
                 )}
               </h1>
               <p className="text-gray-400 mt-2 font-bold uppercase tracking-widest text-[10px]">
-                {posts?.length || 0} {posts?.length === 1 ? 'edital encontrado' : 'editais encontrados'}
+                {radarPosts.length} {radarPosts.length === 1 ? 'edital aberto encontrado' : 'editais abertos encontrados'}
               </p>
             </div>
             
