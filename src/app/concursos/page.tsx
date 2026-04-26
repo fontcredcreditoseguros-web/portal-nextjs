@@ -21,8 +21,42 @@ export default async function ConcursosPage({
     .eq('niche', 'concursos');
 
   if (uf) {
-    // Busca exata pela sigla com delimitadores para evitar falsos positivos (ex: "SMS" caindo na busca "MS")
-    query = query.or(`title.ilike.% ${uf} %,title.ilike.%-${uf}%,title.ilike.%-${uf},title.ilike.%/${uf}%,title.ilike.%(${uf})%`);
+    // Mapeamento de siglas para nomes completos para melhorar a busca
+    const nomesEstados: { [key: string]: string } = {
+      'MS': 'Mato Grosso do Sul',
+      'SP': 'São Paulo',
+      'RJ': 'Rio de Janeiro',
+      'MG': 'Minas Gerais',
+      'PR': 'Paraná',
+      'RS': 'Rio Grande do Sul',
+      'SC': 'Santa Catarina',
+      'GO': 'Goiás',
+      'MT': 'Mato Grosso',
+      'BA': 'Bahia',
+      'PE': 'Pernambuco',
+      'CE': 'Ceará',
+      'PA': 'Pará',
+      'DF': 'Distrito Federal'
+    };
+
+    const nomeCompleto = nomesEstados[uf];
+    
+    // Padrões de busca inteligentes
+    const searchTerms = [
+      `title.ilike.% ${uf} %`,
+      `title.ilike.%-${uf}%`,
+      `title.ilike.%(${uf})%`,
+      `title.ilike.% ${uf}`,
+      `content.ilike.% ${uf} %`,
+      `content.ilike.%(${uf})%`
+    ];
+
+    if (nomeCompleto) {
+      searchTerms.push(`title.ilike.%${nomeCompleto}%`);
+      searchTerms.push(`content.ilike.%${nomeCompleto}%`);
+    }
+
+    query = query.or(searchTerms.join(','));
   }
 
   const { data: posts } = await query.order('published_at', { ascending: false });
