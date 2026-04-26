@@ -47,7 +47,7 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
   sanitizedContent = sanitizedContent.replace(/<\/?html[^>]*>/gi, '');
   sanitizedContent = sanitizedContent.replace(/<\/?body[^>]*>/gi, '');
   
-  // 7. Transformar Ficha Técnica em Card Visual (Versão 5 - Híper-Permissiva)
+  // 7. Transformar Ficha Técnica em Card Visual (Versão 6 - O FIM DO PROBLEMA)
   const ficheKeywords = 'Status|Escolaridade|Salário|Remuneração|Vagas|Banca|Inscrições|Cargos|Órgão|Local';
 
   // A. Transformar Tabelas Legadas
@@ -55,7 +55,6 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
     /<table[^>]*>[\s\S]*?<\/table>/gi,
     (match) => {
         if (!new RegExp(ficheKeywords, 'i').test(match)) return match;
-        
         const rows = [];
         const tdRegex = /<td[^>]*>([\s\S]*?)<\/td>/gi;
         let m;
@@ -70,16 +69,13 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
                 }
             }
         }
-        
         if (rows.length < 2) return match;
-
         const listItems = rows.map(([key, val]) => `
             <li class="flex flex-col md:flex-row md:justify-between border-b border-blue-100 py-3 last:border-0 gap-1">
                 <span class="font-black text-blue-900 uppercase text-[10px] tracking-widest">${key}</span>
                 <span class="text-blue-700 font-bold text-sm">${val || 'Consultar Edital'}</span>
             </li>
         `).join('');
-
         return `
         <div class="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-100 rounded-3xl p-6 md:p-8 my-12 shadow-xl shadow-blue-500/5 not-prose">
             <div class="flex items-center justify-between mb-8">
@@ -94,37 +90,44 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
     }
   );
 
-  // B. Transformar Blocos de Texto (Fallback)
-  sanitizedContent = sanitizedContent.replace(
-    new RegExp(`((?:${ficheKeywords}):(?:\s|&nbsp;|<br\s*\/?>)*.*?(?:<br\s*\/?>|\n|$)){3,}`, 'gi'),
-    (match) => {
-        const cleanBlock = match.replace(/<\/?p>/gi, '').replace(/&nbsp;/gi, ' ');
-        const rows = cleanBlock.split(/<br\s*\/?>|\n/).filter(r => r.trim().includes(':'));
-        
-        const listItems = rows.map(r => {
-            const separatorIndex = r.indexOf(':');
-            const key = r.substring(0, separatorIndex).trim();
-            const val = r.substring(separatorIndex + 1).trim();
-            
-            return `<li class="flex flex-col md:flex-row md:justify-between border-b border-blue-100 py-3 last:border-0 gap-1">
-                <span class="font-black text-blue-900 uppercase text-[10px] tracking-widest">${key}</span>
-                <span class="text-blue-700 font-bold text-sm">${val || 'Consultar Edital'}</span>
-            </li>`;
-        }).join('');
-        
-        return `
-        <div class="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-100 rounded-3xl p-6 md:p-8 my-12 shadow-xl shadow-blue-500/5 not-prose">
-            <div class="flex items-center justify-between mb-8">
-                <h3 class="text-lg font-black text-blue-900 flex items-center">
-                    <span class="w-2 h-6 bg-blue-600 rounded-full mr-3"></span>
-                    DETALHES DO EDITAL
-                </h3>
-                <span class="bg-blue-600 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">Radar Elite</span>
-            </div>
-            <ul class="space-y-1">${listItems}</ul>
-        </div>`;
-    }
-  );
+  // B. Transformar Blocos de Texto/Parágrafos (Onde o problema persistia)
+  // Esta regex agora é cega para tags HTML entre as linhas de metadados
+  const metaLinePattern = `(?:(?:<[^>]+>)*\\s*(?:${ficheKeywords}):(?:\s|&nbsp;)*[\\s\\S]*?(?:<\/[^>]+>|<br\\s*\\/?>|\\n|\\s)*)`;
+  const fullBlockRegex = new RegExp(`(${metaLinePattern}{3,})`, 'gi');
+
+  sanitizedContent = sanitizedContent.replace(fullBlockRegex, (match) => {
+    // Limpeza profunda para extrair apenas Chave: Valor
+    const cleanBlock = match
+        .replace(/&nbsp;/gi, ' ')
+        .replace(/<[^>]+>/g, '\n') // Transforma tags em quebras de linha
+        .split('\n')
+        .map(l => l.trim())
+        .filter(l => l.includes(':') && new RegExp(ficheKeywords, 'i').test(l));
+
+    if (cleanBlock.length < 2) return match;
+
+    const listItems = cleanBlock.map(r => {
+        const separatorIndex = r.indexOf(':');
+        const key = r.substring(0, separatorIndex).trim();
+        const val = r.substring(separatorIndex + 1).trim();
+        return `<li class="flex flex-col md:flex-row md:justify-between border-b border-blue-100 py-3 last:border-0 gap-1">
+            <span class="font-black text-blue-900 uppercase text-[10px] tracking-widest">${key}</span>
+            <span class="text-blue-700 font-bold text-sm">${val || 'Consultar Edital'}</span>
+        </li>`;
+    }).join('');
+
+    return `
+    <div class="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-100 rounded-3xl p-6 md:p-8 my-12 shadow-xl shadow-blue-500/5 not-prose">
+        <div class="flex items-center justify-between mb-8">
+            <h3 class="text-lg font-black text-blue-900 flex items-center">
+                <span class="w-2 h-6 bg-blue-600 rounded-full mr-3"></span>
+                DETALHES DO EDITAL
+            </h3>
+            <span class="bg-blue-600 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">Radar Elite</span>
+        </div>
+        <ul class="space-y-1">${listItems}</ul>
+    </div>`;
+  });
 
   return (
     <article className="max-w-4xl mx-auto px-4 py-12">
