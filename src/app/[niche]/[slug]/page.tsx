@@ -47,48 +47,11 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
   sanitizedContent = sanitizedContent.replace(/<\/?html[^>]*>/gi, '');
   sanitizedContent = sanitizedContent.replace(/<\/?body[^>]*>/gi, '');
   
-  // 7. Transformar Ficha Técnica em Card Visual (Versão Final - Brute Force)
+  // 7. Estilização Universal de Tabelas (Garante que posts legados fiquem bonitos)
+  sanitizedContent = sanitizedContent.replace(/<table/gi, '<table class="edital-data-table"');
+  
+  // 8. Transformar Blocos de Texto em Cards (Fallback)
   const ficheKeywords = 'Status|Escolaridade|Salário|Remuneração|Vagas|Banca|Inscrições|Cargos|Órgão|Local';
-
-  // A. Transformar Tabelas Legadas (Mais simples e direta)
-  sanitizedContent = sanitizedContent.replace(/<table[^>]*>([\s\S]*?)<\/table>/gi, (match, tableContent) => {
-    if (!new RegExp(ficheKeywords, 'i').test(match)) return match;
-    
-    const rows = [];
-    const trRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
-    let trMatch;
-    while ((trMatch = trRegex.exec(tableContent)) !== null) {
-        const tds = trMatch[1].match(/<td[^>]*>([\s\S]*?)<\/td>/gi);
-        if (tds && tds.length >= 2) {
-            const key = tds[0].replace(/<[^>]*>/g, '').replace(/&nbsp;/gi, ' ').replace(/:$/, '').trim();
-            const val = tds[1].replace(/<[^>]*>/g, '').replace(/&nbsp;/gi, ' ').trim();
-            if (key) rows.push([key, val]);
-        }
-    }
-
-    if (rows.length < 2) return match;
-
-    const listItems = rows.map(([key, val]) => `
-        <li class="flex flex-col md:flex-row md:justify-between border-b border-blue-100 py-3 last:border-0 gap-1">
-            <span class="font-black text-blue-900 uppercase text-[10px] tracking-widest">${key}</span>
-            <span class="text-blue-700 font-bold text-sm">${val || 'Consultar Edital'}</span>
-        </li>
-    `).join('');
-
-    return `
-    <div class="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-100 rounded-3xl p-6 md:p-8 my-12 shadow-xl shadow-blue-500/5 not-prose border-l-8 border-l-blue-600">
-        <div class="flex items-center justify-between mb-8">
-            <h3 class="text-lg font-black text-blue-900 flex items-center">
-                <span class="w-2 h-6 bg-blue-600 rounded-full mr-3"></span>
-                DETALHES DO EDITAL
-            </h3>
-            <span class="bg-blue-600 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">Radar Elite</span>
-        </div>
-        <ul class="space-y-1">${listItems}</ul>
-    </div>`;
-  });
-
-  // B. Transformar Parágrafos Soltos (Regex Robusta)
   sanitizedContent = sanitizedContent.replace(/((?:<p[^>]*>)?\s*(?:Status|Escolaridade|Salário|Vagas|Banca|Órgão|Cargos):[\s\S]*?(?:<\/p>|<br\s*\/?>|\n|$)){3,}/gi, (match) => {
     const lines = match.replace(/&nbsp;/gi, ' ').replace(/<[^>]*>/g, '\n').split('\n').map(l => l.trim()).filter(l => l.includes(':'));
     if (lines.length < 2) return match;
@@ -102,7 +65,7 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
     }).join('');
 
     return `
-    <div class="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-100 rounded-3xl p-6 md:p-8 my-12 shadow-xl shadow-blue-500/5 not-prose border-l-8 border-l-blue-600">
+    <div class="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 rounded-3xl p-6 md:p-8 my-12 shadow-xl shadow-blue-500/10 not-prose border-l-8 border-l-blue-600">
         <div class="flex items-center justify-between mb-8">
             <h3 class="text-lg font-black text-blue-900 flex items-center">
                 <span class="w-2 h-6 bg-blue-600 rounded-full mr-3"></span>
@@ -116,6 +79,44 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
 
   return (
     <article className="max-w-4xl mx-auto px-4 py-12">
+      <style dangerouslySetInnerHTML={{ __html: `
+        .edital-data-table {
+          width: 100% !important;
+          border-collapse: separate !important;
+          border-spacing: 0 4px !important;
+          margin: 3rem 0 !important;
+          border: 2px solid #3b82f6 !important;
+          border-radius: 24px !important;
+          overflow: hidden !important;
+          box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1) !important;
+          background: white !important;
+        }
+        .edital-data-table tr {
+          background: white !important;
+        }
+        .edital-data-table td {
+          padding: 16px 24px !important;
+          border-bottom: 1px solid #eff6ff !important;
+        }
+        .edital-data-table td:first-child {
+          background: #eff6ff !important;
+          color: #1e40af !important;
+          font-weight: 900 !important;
+          text-transform: uppercase !important;
+          font-size: 0.65rem !important;
+          letter-spacing: 0.1em !important;
+          width: 35% !important;
+          border-right: 2px solid #3b82f6 !important;
+        }
+        .edital-data-table td:last-child {
+          color: #1d4ed8 !important;
+          font-weight: 700 !important;
+          font-size: 0.95rem !important;
+        }
+        .dark .edital-data-table { background: #0f172a !important; border-color: #1e40af !important; }
+        .dark .edital-data-table td:first-child { background: #1e293b !important; color: #60a5fa !important; }
+        .dark .edital-data-table td:last-child { color: #93c5fd !important; }
+      `}} />
       {/* Header do Post */}
       <header className="mb-12">
         <div className="flex items-center space-x-2 text-sm font-bold text-blue-600 uppercase tracking-widest mb-4">
