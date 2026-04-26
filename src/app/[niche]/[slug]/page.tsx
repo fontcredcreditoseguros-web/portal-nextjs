@@ -52,7 +52,7 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
   
   // 8. Transformar Blocos de Texto em Cards (Fallback)
   const ficheKeywords = 'Status|Escolaridade|Salário|Remuneração|Vagas|Banca|Inscrições|Cargos|Órgão|Local';
-  sanitizedContent = sanitizedContent.replace(/((?:<p[^>]*>)?\s*(?:Status|Escolaridade|Salário|Vagas|Banca|Órgão|Cargos):[\s\S]*?(?:<\/p>|<br\s*\/?>|\n|$)){3,}/gi, (match) => {
+  sanitizedContent = sanitizedContent.replace(/((?:<p[^>]*>)?\s*(?:Status|Escolaridade|Salário|Vagas|Banca|Órgão|Cargos):[\s\S]*?(?:<\/p>|<br\s*\/?>|\n|$)){3,}/gi, (match: string) => {
     const lines = match.replace(/&nbsp;/gi, ' ').replace(/<[^>]*>/g, '\n').split('\n').map(l => l.trim()).filter(l => l.includes(':'));
     if (lines.length < 2) return match;
 

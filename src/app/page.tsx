@@ -1,5 +1,6 @@
 import { supabase, sanitizeTitle } from '@/lib/supabaseClient';
 import DensePostRow from '@/components/DensePostRow';
+import PostCard from '@/components/PostCard';
 import SmartImage from '@/components/SmartImage';
 import ConcursosHero from '@/components/ConcursosHero';
 import { Search, MapPin, GraduationCap, Building2, Flame } from 'lucide-react';
