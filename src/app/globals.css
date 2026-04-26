@@ -39,3 +39,56 @@ body {
   background: rgba(2, 6, 23, 0.7);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+/* Estilização Profissional para Tabelas de Editais (Fallback) */
+.prose table {
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 4px !important;
+  margin: 2rem 0 !important;
+  border: none !important;
+}
+
+.prose table tr {
+  background: #f8fafc !important;
+  transition: all 0.2s !important;
+}
+
+.prose table tr:hover {
+  background: #f1f5f9 !important;
+}
+
+.prose table td {
+  padding: 12px 16px !important;
+  border: 1px solid #e2e8f0 !important;
+  font-size: 0.9rem !important;
+}
+
+.prose table td:first-child {
+  background: #eff6ff !important;
+  color: #1e40af !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  font-size: 0.7rem !important;
+  letter-spacing: 0.05em !important;
+  width: 35% !important;
+  border-right: 2px solid #3b82f6 !important;
+}
+
+.prose table td:last-child {
+  color: #334155 !important;
+  font-weight: 600 !important;
+}
+
+.dark .prose table tr {
+  background: #0f172a !important;
+}
+
+.dark .prose table td {
+  border-color: #1e293b !important;
+}
+
+.dark .prose table td:first-child {
+  background: #1e293b !important;
+  color: #60a5fa !important;
+}
