@@ -48,15 +48,22 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
   sanitizedContent = sanitizedContent.replace(/<\/?body[^>]*>/gi, '');
   
   // 7. Transformar Ficha Técnica de Texto em Card Visual (Para posts antigos)
+  // Versão 3: Robusta contra &nbsp;, quebras de linha e falta de espaços
   sanitizedContent = sanitizedContent.replace(
-    /((?:Status do Concurso|Escolaridade|Salário Base|Vagas|Banca Organizadora|Inscrições|Remuneração):.*?(?:\n|<br\s*\/?>|$)){3,}/gi,
+    /((?:Status do Concurso|Escolaridade|Salário Base|Vagas|Banca Organizadora|Inscrições|Remuneração|Cargos):(?:\s|&nbsp;|<br\s*\/?>)*.*?(?:<br\s*\/?>|\n|$)){3,}/gi,
     (match) => {
-        const rows = match.split(/<br\s*\/?>|\n/).filter(r => r.trim().includes(':'));
+        // Limpa o lixo HTML (tags <p> residuais, &nbsp;) antes de processar as linhas
+        const cleanBlock = match.replace(/<\/?p>/gi, '').replace(/&nbsp;/gi, ' ');
+        const rows = cleanBlock.split(/<br\s*\/?>|\n/).filter(r => r.trim().includes(':'));
+        
         const listItems = rows.map(r => {
-            const [key, ...val] = r.split(':');
+            const separatorIndex = r.indexOf(':');
+            const key = r.substring(0, separatorIndex).trim();
+            const val = r.substring(separatorIndex + 1).trim();
+            
             return `<li class="flex flex-col md:flex-row md:justify-between border-b border-blue-100 py-3 last:border-0 gap-1">
-                <span class="font-black text-blue-900 uppercase text-[10px] tracking-widest">${key.trim()}</span>
-                <span class="text-blue-700 font-bold text-sm">${val.join(':').trim()}</span>
+                <span class="font-black text-blue-900 uppercase text-[10px] tracking-widest">${key}</span>
+                <span class="text-blue-700 font-bold text-sm">${val || 'A definir'}</span>
             </li>`;
         }).join('');
         
