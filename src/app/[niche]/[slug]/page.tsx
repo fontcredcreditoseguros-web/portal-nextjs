@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import SmartImage from '@/components/SmartImage';
 
-export const revalidate = 60;
+export const revalidate = 0; // Desativar cache para garantir atualização imediata no deploy
 
 async function getPost(slug: string) {
   const { data: post, error } = await supabase
@@ -47,19 +47,20 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
   sanitizedContent = sanitizedContent.replace(/<\/?html[^>]*>/gi, '');
   sanitizedContent = sanitizedContent.replace(/<\/?body[^>]*>/gi, '');
   
-  // 7. Transformar Ficha Técnica de Texto em Card Visual (Para posts antigos)
-  // Versão 4: Robusta contra texto puro E tabelas HTML mal formatadas
-  
-  // A. Caso seja uma TABELA (Padrão de alguns posts legados)
+  // 7. Transformar Ficha Técnica em Card Visual (Versão 5 - Híper-Permissiva)
+  const ficheKeywords = 'Status|Escolaridade|Salário|Remuneração|Vagas|Banca|Inscrições|Cargos|Órgão|Local';
+
+  // A. Transformar Tabelas Legadas
   sanitizedContent = sanitizedContent.replace(
-    /<table[^>]*>[\s\S]*?(?:Status do Concurso|Escolaridade|Salário Base|Vagas|Banca Organizadora|Inscrições|Remuneração|Cargos)[\s\S]*?<\/table>/gi,
+    /<table[^>]*>[\s\S]*?<\/table>/gi,
     (match) => {
+        if (!new RegExp(ficheKeywords, 'i').test(match)) return match;
+        
         const rows = [];
         const tdRegex = /<td[^>]*>([\s\S]*?)<\/td>/gi;
         let m;
         let currentPair = [];
         while ((m = tdRegex.exec(match)) !== null) {
-            // Limpa HTML interno e trim
             const text = m[1].replace(/<[^>]*>/g, '').replace(/&nbsp;/gi, ' ').replace(/:$/, '').trim();
             if (text) {
                 currentPair.push(text);
@@ -70,12 +71,12 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
             }
         }
         
-        if (rows.length < 2) return match; // Não parece uma ficha técnica real
+        if (rows.length < 2) return match;
 
         const listItems = rows.map(([key, val]) => `
             <li class="flex flex-col md:flex-row md:justify-between border-b border-blue-100 py-3 last:border-0 gap-1">
                 <span class="font-black text-blue-900 uppercase text-[10px] tracking-widest">${key}</span>
-                <span class="text-blue-700 font-bold text-sm">${val || 'A definir'}</span>
+                <span class="text-blue-700 font-bold text-sm">${val || 'Consultar Edital'}</span>
             </li>
         `).join('');
 
@@ -93,9 +94,9 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
     }
   );
 
-  // B. Caso seja TEXTO PURO (Fallback)
+  // B. Transformar Blocos de Texto (Fallback)
   sanitizedContent = sanitizedContent.replace(
-    /((?:Status do Concurso|Escolaridade|Salário Base|Vagas|Banca Organizadora|Inscrições|Remuneração|Cargos):(?:\s|&nbsp;|<br\s*\/?>)*.*?(?:<br\s*\/?>|\n|$)){3,}/gi,
+    new RegExp(`((?:${ficheKeywords}):(?:\s|&nbsp;|<br\s*\/?>)*.*?(?:<br\s*\/?>|\n|$)){3,}`, 'gi'),
     (match) => {
         const cleanBlock = match.replace(/<\/?p>/gi, '').replace(/&nbsp;/gi, ' ');
         const rows = cleanBlock.split(/<br\s*\/?>|\n/).filter(r => r.trim().includes(':'));
@@ -107,7 +108,7 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
             
             return `<li class="flex flex-col md:flex-row md:justify-between border-b border-blue-100 py-3 last:border-0 gap-1">
                 <span class="font-black text-blue-900 uppercase text-[10px] tracking-widest">${key}</span>
-                <span class="text-blue-700 font-bold text-sm">${val || 'A definir'}</span>
+                <span class="text-blue-700 font-bold text-sm">${val || 'Consultar Edital'}</span>
             </li>`;
         }).join('');
         
