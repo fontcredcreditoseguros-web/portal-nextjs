@@ -3,8 +3,9 @@ import { notFound } from 'next/navigation';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import SmartImage from '@/components/SmartImage';
+import type { Metadata, ResolvingMetadata } from 'next';
 
-export const revalidate = 0; // Desativar cache para garantir atualização imediata no deploy
+export const revalidate = 3600; // Cache de 1 hora para SEO e Performance
 
 async function getPost(slug: string) {
   const { data: post, error } = await supabase
@@ -15,6 +16,42 @@ async function getPost(slug: string) {
 
   if (error || !post) return null;
   return post;
+}
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ niche: string, slug: string }> },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getPost(slug);
+
+  if (!post) return { title: 'Post não encontrado' };
+
+  const cleanTitle = sanitizeTitle(post.title);
+  // O excerpt contém dados estruturados (🚨 9 | 💰 R$ ...), vamos extrair uma descrição limpa
+  const descRaw = post.excerpt || '';
+  const descClean = descRaw.replace(/[🚨💰🎓📅|]/g, ' ').replace(/\s+/g, ' ').trim();
+
+  return {
+    title: `${cleanTitle} | Portal Concursos Elite`,
+    description: descClean || `Confira todos os detalhes sobre ${cleanTitle}. Vagas, salários e prazos atualizados em 2026.`,
+    alternates: {
+      canonical: `/${post.niche}/${post.slug}`,
+    },
+    openGraph: {
+      title: cleanTitle,
+      description: descClean,
+      images: post.image_url ? [post.image_url] : [],
+      type: 'article',
+      publishedTime: post.published_at,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: cleanTitle,
+      description: descClean,
+      images: post.image_url ? [post.image_url] : [],
+    }
+  };
 }
 
 export default async function PostPage({ params }: { params: Promise<{ niche: string, slug: string }> }) {
@@ -46,6 +83,10 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
   // 6. Limpeza de tags HTML erradas injetadas pela IA
   sanitizedContent = sanitizedContent.replace(/<\/?html[^>]*>/gi, '');
   sanitizedContent = sanitizedContent.replace(/<\/?body[^>]*>/gi, '');
+
+  // 6.1 Transformar H1 em H2 para evitar duplicidade SEO
+  sanitizedContent = sanitizedContent.replace(/<h1/gi, '<h2');
+  sanitizedContent = sanitizedContent.replace(/<\/h1>/gi, '</h2>');
   
   // 7. Estilização Universal de Tabelas (Garante que posts legados fiquem bonitos)
   sanitizedContent = sanitizedContent.replace(/<table/gi, '<table class="edital-data-table"');
@@ -77,8 +118,26 @@ export default async function PostPage({ params }: { params: Promise<{ niche: st
     </div>`;
   });
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "headline": cleanTitle,
+    "image": [post.image_url],
+    "datePublished": post.published_at,
+    "dateModified": post.published_at,
+    "author": [{
+      "@type": "Person",
+      "name": post.author || "Sofia IA",
+      "url": "https://concursoselite.com.br"
+    }]
+  };
+
   return (
     <article className="max-w-4xl mx-auto px-4 py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <style dangerouslySetInnerHTML={{ __html: `
         .edital-data-table {
           width: 100% !important;

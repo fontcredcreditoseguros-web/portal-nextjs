@@ -6,7 +6,7 @@ import ConcursosHero from '@/components/ConcursosHero';
 import { Search, MapPin, GraduationCap, Building2, Flame } from 'lucide-react';
 import Link from 'next/link';
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 async function getPosts(niche: string) {
   const { data: posts, error } = await supabase
