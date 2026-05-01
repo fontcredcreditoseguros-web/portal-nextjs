@@ -8,7 +8,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Buscar todos os posts publicados DO NICHO DESTE PORTAL
   const { data: posts } = await supabase
     .from('posts')
-    .select('slug, published_at, niche')
+    .select('slug, published_at, niche, image_url')
     .eq('is_published', true)
     .eq('niche', 'concursos');
 
@@ -17,6 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(post.published_at),
     changeFrequency: 'daily',
     priority: 0.7,
+    images: post.image_url ? [post.image_url] : undefined,
   }));
 
   const staticEntries: MetadataRoute.Sitemap = [
